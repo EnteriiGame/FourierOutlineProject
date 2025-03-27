@@ -27,14 +27,17 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         display.cpp
         Complex.h
         Complex.cpp
-        RotatorSet.h
-        RotatorSet.cpp
+
+
         Path.h
 
         Path.h
         Path.cpp
-        FFT.h
-        FFT.cpp
+
+
+        VectorDisplay.h
+        VectorDisplay.cpp
+        Vector.h
 
 
     )

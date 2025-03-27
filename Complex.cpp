@@ -21,11 +21,20 @@ float cos(float x){
     Complex Complex::operator+(Complex other){
         return Complex(rel+other.rel,img+other.img);
     };
+    void Complex::operator+=(Complex other){
+        rel+=other.rel;
+        img+=other.img;
+    };
     Complex Complex::operator-(Complex other){
         return Complex(rel-other.rel,img-other.img);
     };
     Complex Complex::operator*(Complex other){
         return Complex(rel*other.rel - img*other.img,rel*other.img + img*other.rel);
+    };
+    void Complex::operator*=(Complex other){
+        float a=rel;
+        rel = rel*other.rel - img*other.img;
+        img =a*other.img + img*other.rel;
     };
     Complex Complex::operator*(float other){
         return Complex(rel*other,img*other);

@@ -1,0 +1,9 @@
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/window.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/window_autogen_timestamp_deps.dir
+C:/Users/EnteriiGames/Desktop/Driver/window/build/Desktop_Qt_6_8_2_MinGW_64_bit-Debug/CMakeFiles/window_autogen.dir

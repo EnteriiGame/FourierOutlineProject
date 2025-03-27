@@ -1,10 +1,11 @@
 #include "display.h"
 #include <QApplication>
 #include <QMouseEvent>
-#include <iostream>
 #include "Path.h"
 
 using namespace std;
+
+
 
 ImageWidget::ImageWidget(Pixel **externalData, int width, int height, QWidget *parent)
     : QWidget(parent), data(externalData), width(width), height(height) {
@@ -67,16 +68,15 @@ void ImageWidget::connectPixel(int x1, int y1, int x2, int y2) {
     int sy = (y1 < y2) ? 1 : -1;
     int err = dx - dy;
 
-    while ((x1 != x2) || (y1 != y2)) {  // Continue until BOTH coordinates match
+    while ((x1 != x2) || (y1 != y2)) {
         if (x1 >= 0 && x1 < width && y1 >= 0 && y1 < height) {
-            data[y1][x1].black = true; // Set pixel to black
+            data[y1][x1].black = true;
         }
         int e2 = err * 2;
-        if (e2 > -dy) { err -= dy; x1 += sx; }  // Move in x-direction
-        if (e2 < dx) { err += dx; y1 += sy; }  // Move in y-direction
+        if (e2 > -dy) { err -= dy; x1 += sx; }
+        if (e2 < dx) { err += dx; y1 += sy; }
     }
 
-    // Ensure last point is drawn
     if (x2 >= 0 && x2 < width && y2 >= 0 && y2 < height) {
         data[y2][x2].black = true;
     }
@@ -88,7 +88,7 @@ void ImageWidget::connectPixel(int x1, int y1, int x2, int y2) {
 void ImageWidget::clearBitmap(){
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            data[y][x].black = false; // Reset all to white
+            data[y][x].black = false;
         }
     }}
 
@@ -96,23 +96,24 @@ void ImageWidget::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Return) {
         clearBitmap();
         CurrentStroke->SimplifyPath();
+        CurrentStroke->Interpolation();
+        CurrentStroke->applyFFT();
+        emit shapeReady(CurrentStroke);
+        for (int i = 0; i < CurrentStroke->N; i++) {
+        }
 
         Path* current = CurrentStroke->start;
         while (current && current->next) {
             data[current->y][current->x].black = true;
-            cout<<"Conecting("<<current->x<<","<<current->y<<")("<<current->next->x<<","<<current->next->y<<")"<<endl;
-
             connectPixel(current->x, current->y, current->next->x, current->next->y);
             current= current->next;
         }
 
-        //connectPixel(10,10,40,10);
         updateImage();
     }
 }
 
 void ImageWidget::modifyPixel(int x,int y) {
-    cout<<"posUP"<<x<<" "<<y<<endl;
         if (eraser){
             data[y][x].black = false;
         }

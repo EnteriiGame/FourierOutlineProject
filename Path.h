@@ -2,11 +2,12 @@
 #define PATH_H
 #include "Complex.h"
 
-struct RotatorCoeficients{
-    int N=9;
-    Complex* CW; //clockwise
-    Complex* CCW;//counter clockwise
-    Complex* NR; //no rotation
+struct RotatorCoeficients {
+    void setN(int n = 1);
+    int N;
+    Complex* C;
+    RotatorCoeficients();
+    ~RotatorCoeficients();
 };
 
 struct Path{
@@ -27,12 +28,15 @@ struct shape{
     shape(int x, int y);
     ~shape();
     void SimplifyPath();//RDP Rammer-Doglas-Peucker
-    void reSampling();// will interpolate between the Paths and add evenly spaced points for better Fourier transform
     void add(int x, int y);
     void RDP(Path* S, Path* E);
-    /*Rotator* FourierSetP;
-    Rotator* offset;
-    Rotator* FourierSetN;*/
+    RotatorCoeficients FC;//
+
+    void Interpolation();//i need for the ammount of points to be a power of 2 so i will interpolate between the longest streches untill it is
+    void FFT(Complex* data, int N);
+    void applyFFT();
+
+
 };
 
 
