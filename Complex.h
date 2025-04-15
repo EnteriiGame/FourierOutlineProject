@@ -5,7 +5,7 @@ const double PI = 3.1415926535897;
 //float sin(float x);
 //float cos(float x);
 
-
+#include <iostream>
 #include <cmath>
 
 struct Complex{
@@ -22,7 +22,10 @@ struct Complex{
     Complex operator*(float other);
     Complex operator/(Complex other);
     Complex operator/(float other);
-
+    friend std::ostream& operator<<(std::ostream& os, const Complex& z){
+        os <<z.rel<<" +i "<<z.img <<"\t";
+        return os;
+    };
 };
 Complex ComplexExp(double theata);
 

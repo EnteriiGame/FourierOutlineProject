@@ -1,7 +1,6 @@
 #include "VectorDisplay.h"
 #include <QPainter>
 #include <cmath>
-#include <iostream>
 
 int TraceLength = 100;
 double speedM = 20;
@@ -48,7 +47,7 @@ void VectorDisplay::paintEvent(QPaintEvent *event) {
     Complex sum(0, 0);
     Complex prev(0, 0);
     float scale = .05;
-    speedM = speedM/(traces.N/2);
+    speedM = speedM/(traces.N/2-1);
 
     for (size_t k = 0; k< traces.N; ++k) {
         double freq;
@@ -60,11 +59,6 @@ void VectorDisplay::paintEvent(QPaintEvent *event) {
         Complex rotatingVector = traces.C[k];
         rotatingVector *= ComplexExp((freq*time*PI)/speed);
         sum += rotatingVector;
-
-        /*std::cout << "k=" << k << " Freq=" << freq
-                  << " Vector=(" << rotatingVector.rel << ", " << rotatingVector.img << ")"
-                  << " Sum=(" << sum.rel << ", " << sum.img << ")" << std::endl;
-*/ //don't touch or you will see that i have no idea how to close this process
 
         painter.setPen(Qt::black);
         painter.drawLine(prev.rel * scale, prev.img * scale, sum.rel * scale, sum.img * scale);
@@ -81,7 +75,7 @@ void VectorDisplay::paintEvent(QPaintEvent *event) {
 
 
     for (size_t i = 0; i < tracePoints.size()-1; ++i) {
-        int alpha = 255 * (i + 1) / tracePoints.size(); // Fading effect
+        int alpha = 255 * (i + 1) / tracePoints.size();
         painter.setPen(QColor(0, 0, 255, alpha));
         painter.drawLine(tracePoints[i],tracePoints[i+1]);
     }

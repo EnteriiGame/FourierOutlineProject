@@ -2,7 +2,6 @@
 #include "Path.h"
 #include <cmath>
 #include <vector>
-#include <iostream>
 
 
 float threashold = .5f;
@@ -113,52 +112,73 @@ void shape::add(int x, int y){
     end = newPath;
 }
 
-bool isPow2(int a){
-    while (a>2){if(a%2==1) return false;
-    a/=2;}
-    return true;
-}
-
 void shape::Interpolation() {
 
     N = 0;
+    for (Path* temp = start;temp;temp = temp->next) {N++;}
+    int k = 1;
+    for (;k < N;k *= 2) {}
+    k-=N;
+    if(k==0) return;
     Path* temp = start;
-    while (temp) {
-        N++;
-        temp = temp->next;
-    }
-    int targetCount = 1;
-    while (targetCount < N) {
-        targetCount *= 2;
-    }
-    //cout<<"N="<<N<<endl;
+    if (!temp) return;
+    Path** gaps = new Path*[k] ;
+    int* dis = new int[k];
+    int* cuts =new int [k];
 
-    while (N < targetCount) {
-        Path* maxGapStart = nullptr;
-        float maxGapSize = 0;
-        temp = start;
-        while (temp->next) {
-            float gap = sqrt(pow(temp->next->x - temp->x, 2) + pow(temp->next->y - temp->y, 2));
-            if (gap > maxGapSize) {
-                maxGapSize = gap;
-                maxGapStart = temp;
+    for(int i=0;(i<k)&&(temp->next);temp=temp->next,i++){
+        gaps[i]=temp;
+        dis[i]=pow(2,(temp->x-temp->next->x))+pow(2,(temp->y-temp->next->y));
+        cuts[i]=1;
+    }
+    for (int i = 0; i < k - 1; i++) {
+        int maxDis = i;
+        for (int j = i + 1; j < k; j++) {
+            if (dis[j] < dis[maxDis]) {
+                maxDis = j;}}
+        int tempDis = dis[i];
+        dis[i] = dis[maxDis];
+        dis[maxDis] = tempDis;
+        Path* tempGap = gaps[i];
+        gaps[i] = gaps[maxDis];
+        gaps[maxDis] = tempGap;
+        int tempCuts = cuts[i];
+        cuts[i] = cuts[maxDis];
+        cuts[maxDis] = tempCuts;
+    }
+    int minD=dis[0];
+    for(;temp->next;temp=temp->next){
+        int d=pow(2,(temp->x-temp->next->x))+pow(2,(temp->y-temp->next->y));
+        if(d>minD){
+            for(int i =0; i< k;i++){
+                if(d<dis[i]){break;}
+                for(int j=1;j<i+1;j++){dis[j-1]=dis[j];gaps[j-1]=gaps[j];}
             }
-            temp = temp->next;
-        }
-
-        if (maxGapStart) {
-            int newX = (maxGapStart->x + maxGapStart->next->x) / 2;
-            int newY = (maxGapStart->y + maxGapStart->next->y) / 2;
-            Path* newPoint = new Path(newX, newY, N);
-
-            newPoint->next = maxGapStart->next;
-            newPoint->prev = maxGapStart;
-            maxGapStart->next->prev = newPoint;
-            maxGapStart->next = newPoint;
-            N++;
-            //cout<<"New "<<N<<endl;
+            minD=dis[0];
         }
     }
+    int i=k-1; int j=0;
+    while(i!=j){
+        if(dis[i]/float(cuts[i]+1)>=dis[j]){cuts[i]++;cuts[j]--;j++;}
+        else i--;
+    }
+    for (int i = 0; i < k; i++){
+        temp = gaps[i];
+        int x1 = temp->x;
+        int y1 = temp->y;
+        int x2 = temp->next->x;
+        int y2 = temp->next->y;
+        for (int j=0; j<cuts[i];j++){
+            temp->next=new Path(x1+(((x2-x1)*(j+1))/float(cuts[i])),y1+(((y2-y1)*(j+1))/float(cuts[i])),0,temp,temp->next);
+            temp=temp->next;
+        }
+    }
+    N = 0;
+    for (Path* temp = start;temp;temp = temp->next) {N++;}
+
+    delete[] gaps;
+    delete[] dis;
+    delete[] cuts;
 }
 
 

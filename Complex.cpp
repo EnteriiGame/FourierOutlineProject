@@ -1,5 +1,6 @@
 #include "Complex.h"
 
+
 auto sq= [](float x)->float{return (x*x);};
 float sin(float x){
     double f=1;
@@ -15,6 +16,7 @@ float cos(float x){
     for (int n = N - 1; n > 0; --n) {
         f = 1 - (x2 / ((2 * n-1) * (2 * n))) * f;}
     return x * f;}
+
     Complex Complex::Conjugate(){
         return Complex(rel,-img);
     }
