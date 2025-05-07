@@ -1,17 +1,12 @@
 #include "Complex.h"
 #include "Path.h"
 #include <cmath>
-#include <vector>
-
 
 float threashold = .5f;
-
-using namespace std;
 
 RotatorCoeficients::RotatorCoeficients() {
     C = new Complex[1];
 }
-
 
 void RotatorCoeficients::setN(int n) {
     if (N != n) {
@@ -43,9 +38,7 @@ shape::~shape() {
     start = nullptr;
 }
 
-Path::~Path() {
-}
-
+Path::~Path() {}
 
 float pointDis(int px, int py, int x1, int y1, int x2, int y2) {
     if (x1 == x2 && y1 == y2) {
@@ -59,8 +52,8 @@ void sortDistances(float* dis, Path** toAdd, int size) {
     for (int i = 0; i < size - 1; i++) {
         for (int j = i + 1; j < size; j++) {
             if (dis[i] > dis[j]) {
-                std::swap(dis[i], dis[j]);
-                std::swap(toAdd[i], toAdd[j]);
+                float tmpDis = dis[i]; dis[i] = dis[j]; dis[j] = tmpDis;
+                Path* tmpPath = toAdd[i]; toAdd[i] = toAdd[j]; toAdd[j] = tmpPath;
             }
         }
     }
@@ -86,26 +79,22 @@ void shape::RDP(Path* S, Path* end) {
         RDP(S, farthest);
         RDP(farthest, end);
     } else {
-        vector<Path*> toDelete;
         current = S->next;
         while (current && current != end) {
-            toDelete.push_back(current);
-            current = current->next;
-        }
-        for (Path* p : toDelete) {
-            delete p;
-            //N--;
+            Path* next = current->next;
+            delete current;
+            current = next;
         }
         S->next = end;
         end->prev = S;
     }
 }
 
-void shape::SimplifyPath(){
-    RDP(start,end);
-};//RDP Rammer-Doglas-Peucker
+void shape::SimplifyPath() {
+    RDP(start, end);
+}
 
-void shape::add(int x, int y){
+void shape::add(int x, int y) {
     Path* newPath = new Path(x, y, N);
     end->next = newPath;
     newPath->prev = end;
@@ -113,74 +102,81 @@ void shape::add(int x, int y){
 }
 
 void shape::Interpolation() {
-
     N = 0;
-    for (Path* temp = start;temp;temp = temp->next) {N++;}
+    for (Path* temp = start; temp; temp = temp->next) { N++; }
     int k = 1;
-    for (;k < N;k *= 2) {}
-    k-=N;
-    if(k==0) return;
+    while (k < N) k *= 2;
+    k -= N;
+    if (k == 0) return;
+
     Path* temp = start;
     if (!temp) return;
-    Path** gaps = new Path*[k] ;
-    int* dis = new int[k];
-    int* cuts =new int [k];
 
-    for(int i=0;(i<k)&&(temp->next);temp=temp->next,i++){
-        gaps[i]=temp;
-        dis[i]=pow(2,(temp->x-temp->next->x))+pow(2,(temp->y-temp->next->y));
-        cuts[i]=1;
+    Path** gaps = new Path*[k];
+    int* dis = new int[k];
+    int* cuts = new int[k];
+
+    for (int i = 0; (i < k) && temp->next; temp = temp->next, i++) {
+        gaps[i] = temp;
+        dis[i] = pow(2, (temp->x - temp->next->x)) + pow(2, (temp->y - temp->next->y));
+        cuts[i] = 1;
     }
+
     for (int i = 0; i < k - 1; i++) {
         int maxDis = i;
         for (int j = i + 1; j < k; j++) {
             if (dis[j] < dis[maxDis]) {
-                maxDis = j;}}
-        int tempDis = dis[i];
-        dis[i] = dis[maxDis];
-        dis[maxDis] = tempDis;
-        Path* tempGap = gaps[i];
-        gaps[i] = gaps[maxDis];
-        gaps[maxDis] = tempGap;
-        int tempCuts = cuts[i];
-        cuts[i] = cuts[maxDis];
-        cuts[maxDis] = tempCuts;
-    }
-    int minD=dis[0];
-    for(;temp->next;temp=temp->next){
-        int d=pow(2,(temp->x-temp->next->x))+pow(2,(temp->y-temp->next->y));
-        if(d>minD){
-            for(int i =0; i< k;i++){
-                if(d<dis[i]){break;}
-                for(int j=1;j<i+1;j++){dis[j-1]=dis[j];gaps[j-1]=gaps[j];}
+                maxDis = j;
             }
-            minD=dis[0];
+        }
+        int tempDis = dis[i]; dis[i] = dis[maxDis]; dis[maxDis] = tempDis;
+        Path* tempGap = gaps[i]; gaps[i] = gaps[maxDis]; gaps[maxDis] = tempGap;
+        int tempCuts = cuts[i]; cuts[i] = cuts[maxDis]; cuts[maxDis] = tempCuts;
+    }
+
+    int minD = dis[0];
+    for (; temp->next; temp = temp->next) {
+        int d = pow(2, (temp->x - temp->next->x)) + pow(2, (temp->y - temp->next->y));
+        if (d > minD) {
+            for (int i = 0; i < k; i++) {
+                if (d < dis[i]) break;
+                for (int j = 1; j < i + 1; j++) {
+                    dis[j - 1] = dis[j];
+                    gaps[j - 1] = gaps[j];
+                }
+            }
+            minD = dis[0];
         }
     }
-    int i=k-1; int j=0;
-    while(i!=j){
-        if(dis[i]/float(cuts[i]+1)>=dis[j]){cuts[i]++;cuts[j]--;j++;}
-        else i--;
+
+    int i = k - 1; int j = 0;
+    while (i != j) {
+        if (dis[i] / float(cuts[i] + 1) >= dis[j]) {
+            cuts[i]++; cuts[j]--; j++;
+        } else i--;
     }
-    for (int i = 0; i < k; i++){
+
+    for (int i = 0; i < k; i++) {
         temp = gaps[i];
         int x1 = temp->x;
         int y1 = temp->y;
         int x2 = temp->next->x;
         int y2 = temp->next->y;
-        for (int j=0; j<cuts[i];j++){
-            temp->next=new Path(x1+(((x2-x1)*(j+1))/float(cuts[i])),y1+(((y2-y1)*(j+1))/float(cuts[i])),0,temp,temp->next);
-            temp=temp->next;
+        for (int j = 0; j < cuts[i]; j++) {
+            temp->next = new Path(x1 + (((x2 - x1) * (j + 1)) / float(cuts[i])),
+                                  y1 + (((y2 - y1) * (j + 1)) / float(cuts[i])), 0,
+                                  temp, temp->next);
+            temp = temp->next;
         }
     }
+
     N = 0;
-    for (Path* temp = start;temp;temp = temp->next) {N++;}
+    for (Path* temp = start; temp; temp = temp->next) { N++; }
 
     delete[] gaps;
     delete[] dis;
     delete[] cuts;
 }
-
 
 void bitReversal(Complex* data, int N) {
     int j = 0;
@@ -220,7 +216,6 @@ void shape::FFT(Complex* data, int N) {
 }
 
 void shape::applyFFT() {
-
     Complex* Z = new Complex[N];
     Path* current = start;
     for (int i = 0; i < N; i++) {

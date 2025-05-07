@@ -11,6 +11,10 @@ public:
     explicit VectorDisplay(QWidget *parent = nullptr);
     ~VectorDisplay();
     void setFC(RotatorCoeficients& trace);//fourier Coefficients
+    void saveCoefficientsToFile();
+    void loadCoefficientsFromFile();
+
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
